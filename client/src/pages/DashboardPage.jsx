@@ -61,25 +61,23 @@ export default function DashboardPage() {
             <div className="stat-card-label">{t('dashboard.active_cases')}</div>
           </div>
         </div>
-        <div className="stat-card" onClick={() => navigate('/archive')} style={{cursor:'pointer'}}>
-          <div className="stat-card-icon gold">
-            <span className="material-icons-outlined">description</span>
-          </div>
-          <div>
-            <div className="stat-card-value">{resolutions.length}</div>
-            <div className="stat-card-label">{t('dashboard.total_resolutions')}</div>
-          </div>
-        </div>
       </div>
 
       {/* Quick Action Banners */}
       <div className="banner-cards">
         <div className="banner-card blue" onClick={() => navigate('/cases')} style={{flex:1}}>
           <div className="banner-card-icon">
-            <span className="material-icons-outlined">add_circle</span>
+            <span className="material-icons-outlined">folder</span>
           </div>
-          <div className="banner-card-title">{t('dashboard.create_case')}</div>
+          <div className="banner-card-title">{t('nav.cases')}</div>
           <div className="banner-card-count">{cases.length} {t('dashboard.total_cases').toLowerCase()}</div>
+        </div>
+        <div className="banner-card gold" onClick={() => navigate('/create-protocol')} style={{flex:1}}>
+          <div className="banner-card-icon">
+            <span className="material-icons-outlined">history_edu</span>
+          </div>
+          <div className="banner-card-title">{t('dashboard.create_protocol')}</div>
+          <div className="banner-card-count">20+ {t('archive.protocols').toLowerCase()}</div>
         </div>
         <div className="banner-card teal" onClick={() => navigate('/create')} style={{flex:1}}>
           <div className="banner-card-icon">

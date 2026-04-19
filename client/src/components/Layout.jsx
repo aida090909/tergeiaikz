@@ -1,13 +1,14 @@
 import { useState } from 'react';
-import { Outlet, NavLink, useLocation } from 'react-router-dom';
+import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext.jsx';
 
 const navItems = [
   { path: '/', icon: 'dashboard', labelKey: 'nav.dashboard' },
   { path: '/cases', icon: 'folder_open', labelKey: 'nav.cases' },
-  { path: '/create', icon: 'add_circle_outline', labelKey: 'nav.create' },
+  { path: '/create-protocol', icon: 'history_edu', labelKey: 'nav.create_protocol' },
+  { path: '/create', icon: 'auto_fix_high', labelKey: 'nav.create' },
   { path: '/archive', icon: 'inventory_2', labelKey: 'nav.archive' },
-  { path: '/history', icon: 'history', labelKey: 'nav.history' },
+  { path: '/profile', icon: 'person', labelKey: 'nav.profile' },
 ];
 
 const adminItems = [
@@ -18,6 +19,7 @@ export default function Layout() {
   const { user, t, lang, switchLang, logout } = useApp();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const userName = lang === 'kz' ? (user?.full_name_kz || user?.full_name) : user?.full_name;
   const initials = userName ? userName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() : 'T';
@@ -30,8 +32,9 @@ export default function Layout() {
     if (p === '/cases') return t('cases.title');
     if (p.startsWith('/cases/')) return t('cases.title');
     if (p === '/create') return t('resolutions.title');
+    if (p === '/create-protocol') return t('nav.create_protocol');
     if (p === '/archive') return t('archive.title');
-    if (p === '/history') return t('history.title');
+    if (p === '/profile') return lang === 'kz' ? 'Профиль' : 'Профиль';
     if (p === '/admin') return t('admin.title');
     return t('app_name');
   };
@@ -44,7 +47,7 @@ export default function Layout() {
       {/* Sidebar */}
       <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
         <div className="sidebar-logo">
-          <div className="sidebar-logo-icon">T</div>
+          <img src="/assets/logo.png" alt="Logo" className="sidebar-logo-img" />
           <div className="sidebar-logo-text">
             <h1>{t('app_name')}</h1>
             <span>{t('app_subtitle')}</span>
@@ -84,15 +87,19 @@ export default function Layout() {
           )}
         </nav>
 
-        <div className="sidebar-user">
-          <div className="sidebar-user-avatar">{initials}</div>
+        <div className="sidebar-user" onClick={() => { navigate('/profile'); closeSidebar(); }} style={{cursor: 'pointer'}}>
+          <div className="sidebar-user-avatar">
+            {user?.avatar ? (
+              <img src={user.avatar} alt="V" style={{width:'100%', height:'100%', borderRadius:'50%', objectFit:'cover'}} />
+            ) : initials}
+          </div>
           <div className="sidebar-user-info">
             <div className="sidebar-user-name">{userName}</div>
             <div className="sidebar-user-role">
               {user?.role === 'admin' ? t('nav.admin') : user?.rank || t('nav.investigators')}
             </div>
           </div>
-          <button className="sidebar-logout" onClick={logout} title={t('nav.logout')}>
+          <button className="sidebar-logout" onClick={(e) => { e.stopPropagation(); logout(); }} title={t('nav.logout')}>
             <span className="material-icons-outlined">logout</span>
           </button>
         </div>

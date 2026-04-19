@@ -6,9 +6,10 @@ import DashboardPage from './pages/DashboardPage.jsx';
 import CasesPage from './pages/CasesPage.jsx';
 import CaseDetailPage from './pages/CaseDetailPage.jsx';
 import CreateResolutionPage from './pages/CreateResolutionPage.jsx';
+import CreateProtocolPage from './pages/CreateProtocolPage.jsx';
 import ArchivePage from './pages/ArchivePage.jsx';
-import HistoryPage from './pages/HistoryPage.jsx';
 import AdminPage from './pages/AdminPage.jsx';
+import ProfilePage from './pages/ProfilePage.jsx';
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useApp();
@@ -39,8 +40,9 @@ function AppRoutes() {
           <Route path="cases" element={<CasesPage />} />
           <Route path="cases/:id" element={<CaseDetailPage />} />
           <Route path="create" element={<CreateResolutionPage />} />
+          <Route path="create-protocol" element={<CreateProtocolPage />} />
           <Route path="archive" element={<ArchivePage />} />
-          <Route path="history" element={<HistoryPage />} />
+          <Route path="profile" element={<ProfilePage />} />
           <Route path="admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
         </Route>
         <Route path="*" element={<Navigate to="/" />} />
