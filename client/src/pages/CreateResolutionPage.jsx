@@ -2,11 +2,43 @@ import { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext.jsx';
 
-const CATEGORY_ICONS = {
-  case_start: 'gavel', persons: 'person_search', investigation: 'search',
-  expertise: 'biotech', restraint: 'lock', restrictions: 'block',
-  case_movement: 'swap_horiz', completion: 'task_alt'
-};
+const RESOLUTION_TYPES = [
+  { id: 'r1', name_kz: 'Қылмыстық іс қозғау және істі өзінің іс жүргізуіне қабылдау туралы қаулы', name_ru: 'Постановление о возбуждении уголовного дела и принятии его к своему производству' },
+  { id: 'r2', name_kz: 'Қылмыстық іс қозғаудан бас тарту туралы қаулы', name_ru: 'Постановление об отказе в возбуждении уголовного дела' },
+  { id: 'r3', name_kz: 'Қылмыстық істі бөлу туралы қаулы', name_ru: 'Постановление о выделении уголовного дела' },
+  { id: 'r4', name_kz: 'Қылмыстық істерді біріктіру туралы қаулы', name_ru: 'Постановление о соединении уголовных дел' },
+  { id: 'r5', name_kz: 'Алдын ала тергеу және айыпталушыны қамауда ұстау мерзімін ұзарту жөнінде өтініш қозғау туралы қаулы', name_ru: 'Постановление о возбуждении ходатайства о продлении срока предварительного следствия и содержания обвиняемого под стражей' },
+  { id: 'r6', name_kz: 'Жәбірленуші деп тану туралы қаулы', name_ru: 'Постановление о признании потерпевшим' },
+  { id: 'r7', name_kz: 'Жәбірленушінің заңды өкілі деп тану туралы қаулы', name_ru: 'Постановление о признании законным представителем потерпевшего' },
+  { id: 'r8', name_kz: 'Кәмелетке толмағанның заңды өкілі деп тану туралы қаулы', name_ru: 'Постановление о признании законным представителем несовершеннолетнего' },
+  { id: 'r9', name_kz: 'Азаматтық талапкер деп тану туралы қаулы', name_ru: 'Постановление о признании гражданским истцом' },
+  { id: 'r10', name_kz: 'Азаматтық жауапкер деп тану туралы қаулы', name_ru: 'Постановление о признании гражданским ответчиком' },
+  { id: 'r11', name_kz: 'Айыпталушы ретінде жауапқа тарту туралы қаулы', name_ru: 'Постановление о привлечении в качестве обвиняемого' },
+  { id: 'r12', name_kz: 'Айыпталушыны қызметінен шеттету туралы қаулы', name_ru: 'Постановление об отстранении обвиняемого от должности' },
+  { id: 'r13', name_kz: 'Айыпталушыны алып келу туралы қаулы', name_ru: 'Постановление о приводе обвиняемого' },
+  { id: 'r14', name_kz: 'Айыпталушыға қатысты қамауға алу-бұлтартпау шарасын қолдану туралы қаулы', name_ru: 'Постановление о применении меры пресечения в виде заключения под стражу в отношении обвиняемого' },
+  { id: 'r15', name_kz: 'Айыпталушыға (сезіктіге) қатысты бұлтартпау шарасын қолдану туралы қаулы', name_ru: 'Постановление о применении меры пресечения в отношении обвиняемого (подозреваемого)' },
+  { id: 'r16', name_kz: 'Айыпталушыға қатысты бұлтартпау шарасын өзгерту туралы қаулы', name_ru: 'Постановление об изменении меры пресечения в отношении обвиняемого' },
+  { id: 'r17', name_kz: 'Бұлтартпау шарасын тоқтату туралы қаулы', name_ru: 'Постановление об отмене меры пресечения' },
+  { id: 'r18', name_kz: 'Куәні айдап әкелу туралы қаулы', name_ru: 'Постановление о приводе свидетеля' },
+  { id: 'r19', name_kz: 'Тінту жүргізу туралы қаулы', name_ru: 'Постановление о производстве обыска' },
+  { id: 'r20', name_kz: 'Алу жүргізу туралы қаулы', name_ru: 'Постановление о производстве выемки' },
+  { id: 'r21', name_kz: 'Жазу үлгілерін, саусақ таңбаларын және т.б. алу туралы қаулы', name_ru: 'Постановление о получении образцов почерка, отпечатков пальцев и др.' },
+  { id: 'r22', name_kz: 'Мүлікке тыйым салу туралы қаулы', name_ru: 'Постановление о наложении ареста на имущество' },
+  { id: 'r23', name_kz: 'Почта-телеграф хат-хабарын тұтқындау және оны алу туралы қаулы', name_ru: 'Постановление о наложении ареста на почтово-телеграфную корреспонденцию и её выемке' },
+  { id: 'r24', name_kz: 'Куәландыру жүргізу туралы қаулы', name_ru: 'Постановление о производстве освидетельствования' },
+  { id: 'r25', name_kz: 'Заттай дәлелдемелерді іске қоса тігу туралы қаулы', name_ru: 'Постановление о приобщении вещественных доказательств к делу' },
+  { id: 'r26', name_kz: 'Сот сараптамасын тағайындау туралы қаулы', name_ru: 'Постановление о назначении судебной экспертизы' },
+  { id: 'r27', name_kz: 'Қосымша сараптама тағайындау туралы қаулы', name_ru: 'Постановление о назначении дополнительной экспертизы' },
+  { id: 'r28', name_kz: 'Қайталама сараптама тағайындау туралы қаулы', name_ru: 'Постановление о назначении повторной экспертизы' },
+  { id: 'r29', name_kz: 'Кешенді сараптама тағайындау туралы қаулы', name_ru: 'Постановление о назначении комплексной экспертизы' },
+  { id: 'r30', name_kz: 'Сотқа дейінгі тергеп-тексеруді тоқтату және айыпталушыға іздестіру жариялау туралы қаулы', name_ru: 'Постановление о приостановлении досудебного расследования и объявлении розыска обвиняемого' },
+  { id: 'r31', name_kz: 'Айыпталушы ретінде жауапқа тартуға жататын адамның анықталмауы себепті алдын ала тергеуді тоқтата тұру туралы қаулы', name_ru: 'Постановление о приостановлении предварительного следствия в связи с неустановлением лица, подлежащего привлечению в качестве обвиняемого' },
+  { id: 'r32', name_kz: 'Шын өкінуіне байланысты қылмыстық істі қысқарту туралы қаулы', name_ru: 'Постановление о прекращении уголовного дела в связи с деятельным раскаянием' },
+  { id: 'r33', name_kz: 'Жағдайдың өзгеруіне байланысты қылмыстық істі қысқарту туралы қаулы', name_ru: 'Постановление о прекращении уголовного дела в связи с изменением обстановки' },
+  { id: 'r34', name_kz: 'Жәбірленушімен ымыраласуға байланысты қылмыстық істі қысқарту туралы қаулы', name_ru: 'Постановление о прекращении уголовного дела в связи с примирением с потерпевшим' },
+  { id: 'r35', name_kz: 'Қылмыстық істі қысқарту туралы қаулы', name_ru: 'Постановление о прекращении уголовного дела' },
+];
 
 export default function CreateResolutionPage() {
   const { t, api, apiDownload, showToast, lang } = useApp();
@@ -15,7 +47,6 @@ export default function CreateResolutionPage() {
 
   const [step, setStep] = useState(1);
   const [cases, setCases] = useState([]);
-  const [types, setTypes] = useState({});
   const [selectedCase, setSelectedCase] = useState(location.state?.caseId || null);
   const [loading, setLoading] = useState(true);
 
@@ -24,7 +55,6 @@ export default function CreateResolutionPage() {
   const [inputText, setInputText] = useState('');
   const [sending, setSending] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedType, setSelectedType] = useState(null);
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [startTime, setStartTime] = useState('');
@@ -37,10 +67,9 @@ export default function CreateResolutionPage() {
   const textareaRef = useRef(null);
 
   useEffect(() => {
-    Promise.all([api('/api/cases'), api('/api/resolutions/types')])
-      .then(([casesData, typesData]) => {
-        setCases(casesData.cases || []);
-        setTypes(typesData.types || {});
+    api('/api/cases')
+      .then(data => {
+        setCases(data.cases || []);
         setLoading(false);
         if (location.state?.caseId) { setSelectedCase(location.state.caseId); setStep(2); }
       })
@@ -55,7 +84,6 @@ export default function CreateResolutionPage() {
         try {
           const parsed = JSON.parse(saved);
           setMessages(parsed.messages || []);
-          setSelectedCategory(parsed.selectedCategory || null);
           setSelectedType(parsed.selectedType || null);
           setStartTime(parsed.startTime || '');
           setEndTime(parsed.endTime || '');
@@ -68,7 +96,6 @@ export default function CreateResolutionPage() {
           text: t('chat.ai_greeting_resolution'),
           timestamp: new Date().toISOString()
         }]);
-        setSelectedCategory(null);
         setSelectedType(null);
         setStartTime('');
         setEndTime('');
@@ -82,10 +109,10 @@ export default function CreateResolutionPage() {
   useEffect(() => {
     if (selectedCase && step === 2 && messages.length > 0) {
       localStorage.setItem(`chat_resolution_${selectedCase}`, JSON.stringify({
-        messages, selectedCategory, selectedType, startTime, endTime, timeSet, generatedDoc
+        messages, selectedType, startTime, endTime, timeSet, generatedDoc
       }));
     }
-  }, [messages, selectedCategory, selectedType, startTime, endTime, timeSet, generatedDoc, selectedCase, step]);
+  }, [messages, selectedType, startTime, endTime, timeSet, generatedDoc, selectedCase, step]);
 
   // Auto-scroll
   useEffect(() => {
@@ -110,12 +137,15 @@ export default function CreateResolutionPage() {
     setSending(true);
     addMessage('bot', t('chat.generating'), { loading: true });
     try {
+      const typeName = lang === 'kz'
+        ? RESOLUTION_TYPES.find(r => r.id === selectedType)?.name_kz
+        : RESOLUTION_TYPES.find(r => r.id === selectedType)?.name_ru;
       const data = await api('/api/resolutions/generate', {
         method: 'POST',
         body: JSON.stringify({
           case_id: selectedCase,
-          resolution_type: selectedType,
-          category: selectedCategory,
+          resolution_type: typeName || selectedType,
+          category: 'resolutions',
           language: lang,
           user_input: userText
         })
@@ -154,10 +184,10 @@ export default function CreateResolutionPage() {
     e.target.value = '';
   };
 
-  const handleSelectType = (categoryKey, typeKey, typeName) => {
-    setSelectedCategory(categoryKey);
-    setSelectedType(typeKey);
+  const handleSelectType = (type) => {
+    setSelectedType(type.id);
     setPanelOpen(false);
+    const typeName = lang === 'kz' ? type.name_kz : type.name_ru;
     addMessage('bot', `✅ ${t('chat.type_selected')}: ${typeName}`);
   };
 
@@ -177,8 +207,8 @@ export default function CreateResolutionPage() {
   };
 
   const selectedCaseData = cases.find(c => c.id.toString() === selectedCase?.toString());
-  const selectedTypeName = selectedCategory && selectedType && types[selectedCategory]?.types?.[selectedType]
-    ? (lang === 'kz' ? types[selectedCategory].types[selectedType].name_kz : types[selectedCategory].types[selectedType].name_ru) || selectedType
+  const selectedTypeName = selectedType
+    ? (lang === 'kz' ? RESOLUTION_TYPES.find(r => r.id === selectedType)?.name_kz : RESOLUTION_TYPES.find(r => r.id === selectedType)?.name_ru) || null
     : null;
 
   if (loading) return <div className="loading"><div className="spinner"></div></div>;
@@ -297,16 +327,34 @@ export default function CreateResolutionPage() {
                     {msg.doc && (
                       <div style={{
                         background:'white', border:'1px solid var(--border-light)',
-                        borderRadius:'var(--radius-md)', padding:16, display:'flex', gap:8, flexWrap:'wrap'
+                        borderRadius:'var(--radius-md)', padding:0, marginTop:8,
+                        overflow:'hidden', maxWidth:'100%'
                       }}>
-                        <button className="btn btn-primary btn-sm" onClick={() => handleDownload(msg.doc.id, 'docx')}>
-                          <span className="material-icons-outlined" style={{fontSize:16}}>description</span>
-                          DOCX
-                        </button>
-                        <button className="btn btn-primary btn-sm" onClick={() => handleDownload(msg.doc.id, 'pdf')}>
-                          <span className="material-icons-outlined" style={{fontSize:16}}>picture_as_pdf</span>
-                          PDF
-                        </button>
+                        <textarea
+                          defaultValue={msg.doc.content || ''}
+                          onChange={e => {
+                            const updated = {...msg.doc, content: e.target.value};
+                            setMessages(prev => prev.map(m => m.id === msg.id ? {...m, doc: updated} : m));
+                            setGeneratedDoc(updated);
+                          }}
+                          style={{
+                            width:'100%', minHeight:250, maxHeight:400, padding:'16px 20px',
+                            border:'none', outline:'none', resize:'vertical',
+                            fontFamily:"'Times New Roman', serif", fontSize:13, lineHeight:1.7,
+                            color:'var(--text-primary)', background:'#FAFBFF',
+                            whiteSpace:'pre-wrap'
+                          }}
+                        />
+                        <div style={{display:'flex', gap:8, padding:'10px 16px', borderTop:'1px solid var(--border-light)', background:'white'}}>
+                          <button className="btn btn-primary btn-sm" onClick={() => handleDownload(msg.doc.id, 'docx')}>
+                            <span className="material-icons-outlined" style={{fontSize:16}}>description</span>
+                            DOCX
+                          </button>
+                          <button className="btn btn-primary btn-sm" onClick={() => handleDownload(msg.doc.id, 'pdf')}>
+                            <span className="material-icons-outlined" style={{fontSize:16}}>picture_as_pdf</span>
+                            PDF
+                          </button>
+                        </div>
                       </div>
                     )}
                     <div style={{fontSize:'var(--font-xs)', color:'var(--text-muted)', alignSelf: msg.role==='user' ? 'flex-end' : 'flex-start'}}>
@@ -474,40 +522,26 @@ export default function CreateResolutionPage() {
                   </button>
                 </div>
                 <div style={{flex:1, overflowY:'auto', padding:'12px'}}>
-                  {Object.entries(types).map(([catKey, cat]) => (
-                    <div key={catKey} style={{marginBottom:12}}>
-                      <div style={{
-                        fontSize:'var(--font-xs)', fontWeight:600, color:'var(--text-muted)',
-                        textTransform:'uppercase', letterSpacing:'0.5px',
-                        padding:'6px 8px', display:'flex', alignItems:'center', gap:6
-                      }}>
-                        <span className="material-icons-outlined" style={{fontSize:14}}>
-                          {CATEGORY_ICONS[catKey] || 'description'}
+                  {RESOLUTION_TYPES.map(type => (
+                    <div
+                      key={type.id}
+                      onClick={() => handleSelectType(type)}
+                      style={{
+                        padding:'12px 14px', borderRadius:'var(--radius-md)', cursor:'pointer',
+                        marginBottom:6, transition:'all 0.15s ease',
+                        background: selectedType === type.id ? 'rgba(108,92,231,0.08)' : 'var(--bg-input)',
+                        border:'1.5px solid ' + (selectedType === type.id ? 'var(--primary)' : 'transparent'),
+                        color: selectedType === type.id ? 'var(--primary)' : 'var(--text-primary)'
+                      }}
+                    >
+                      <div style={{display:'flex', alignItems:'center', gap:8}}>
+                        {selectedType === type.id && (
+                          <span className="material-icons-outlined" style={{fontSize:16, color:'var(--primary)'}}>check_circle</span>
+                        )}
+                        <span style={{fontSize:'var(--font-sm)', fontWeight: selectedType===type.id ? 600 : 400}}>
+                          {lang === 'kz' ? type.name_kz : type.name_ru}
                         </span>
-                        {t(`categories.${catKey}`)}
                       </div>
-                      {Object.entries(cat.types || {}).map(([typeKey, typeVal]) => {
-                        const name = lang === 'kz' ? typeVal.name_kz : (typeVal.name_ru || typeVal.name_kz);
-                        const isSelected = selectedCategory === catKey && selectedType === typeKey;
-                        return (
-                          <div
-                            key={typeKey}
-                            onClick={() => handleSelectType(catKey, typeKey, name)}
-                            style={{
-                              padding:'10px 12px', borderRadius:'var(--radius-sm)', cursor:'pointer',
-                              marginBottom:4, transition:'all 0.15s ease',
-                              background: isSelected ? 'rgba(0,136,255,0.08)' : 'transparent',
-                              border:'1.5px solid ' + (isSelected ? 'var(--primary)' : 'transparent'),
-                              color: isSelected ? 'var(--primary)' : 'var(--text-primary)'
-                            }}
-                          >
-                            <div style={{display:'flex', alignItems:'center', gap:8}}>
-                              {isSelected && <span className="material-icons-outlined" style={{fontSize:14, color:'var(--primary)'}}>check_circle</span>}
-                              <span style={{fontSize:'var(--font-sm)', fontWeight: isSelected ? 600 : 400}}>{name}</span>
-                            </div>
-                          </div>
-                        );
-                      })}
                     </div>
                   ))}
                 </div>

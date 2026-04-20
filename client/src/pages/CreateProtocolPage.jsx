@@ -3,14 +3,33 @@ import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext.jsx';
 
 const PROTOCOL_TYPES = [
-  { id: 'interrogation_suspect', name_kz: 'Күдіктіден жауап алу хаттамасы', name_ru: 'Протокол допроса подозреваемого' },
-  { id: 'interrogation_victim', name_kz: 'Жәбірленушіден жауап алу хаттамасы', name_ru: 'Протокол допроса потерпевшего' },
-  { id: 'interrogation_witness', name_kz: 'Куәдан жауап алу хаттамасы', name_ru: 'Протокол допроса свидетеля' },
-  { id: 'search_protocol', name_kz: 'Тінту хаттамасы', name_ru: 'Протокол обыска' },
-  { id: 'seizure_protocol', name_kz: 'Алу хаттамасы', name_ru: 'Протокол выемки' },
-  { id: 'inspection_protocol', name_kz: 'Оқиға орнын қарау хаттамасы', name_ru: 'Протокол осмотра места происшествия' },
-  { id: 'lineup', name_kz: 'Тануға ұсыну хаттамасы', name_ru: 'Протокол предъявления для опознания' },
-  { id: 'confrontation', name_kz: 'Беттестіру хаттамасы', name_ru: 'Протокол очной ставки' },
+  { id: 'p1', name_kz: 'Жасалған қылмыс туралы ауызша арызды қабылдау хаттамасы', name_ru: 'Протокол принятия устного заявления о совершённом преступлении' },
+  { id: 'p2', name_kz: 'Кінәсін мойындап келу хаттамасы', name_ru: 'Протокол явки с повинной' },
+  { id: 'p3', name_kz: 'Айыпталушыдан жауап алу хаттамасы', name_ru: 'Протокол допроса обвиняемого' },
+  { id: 'p4', name_kz: 'Қылмыс жасады деп сезік келтірілген адамды ұстау хаттамасы', name_ru: 'Протокол задержания лица, подозреваемого в совершении преступления' },
+  { id: 'p5', name_kz: 'Куәдан жауап алу хаттамасы', name_ru: 'Протокол допроса свидетеля' },
+  { id: 'p6', name_kz: 'Кәмелетке толмағаннан жауап алу хаттамасы', name_ru: 'Протокол допроса несовершеннолетнего' },
+  { id: 'p7', name_kz: 'Жәбірленушіден жауап алу хаттамасы', name_ru: 'Протокол допроса потерпевшего' },
+  { id: 'p8', name_kz: 'Беттестіру хаттамасы', name_ru: 'Протокол очной ставки' },
+  { id: 'p9', name_kz: 'Адамды тану хаттамасы', name_ru: 'Протокол опознания человека' },
+  { id: 'p10', name_kz: 'Затты тану хаттамасы', name_ru: 'Протокол опознания предмета' },
+  { id: 'p11', name_kz: 'Адамды фотосуреті бойынша тану хаттамасы', name_ru: 'Протокол опознания человека по фотографии' },
+  { id: 'p12', name_kz: 'Тергеу экспериментінің хаттамасы', name_ru: 'Протокол следственного эксперимента' },
+  { id: 'p13', name_kz: 'Айғақтарды тексеру мен нақтылау хаттамасы', name_ru: 'Протокол проверки и уточнения показаний на месте происшествия' },
+  { id: 'p14', name_kz: 'Тінту хаттамасы', name_ru: 'Протокол обыска' },
+  { id: 'p15', name_kz: 'Ұсталғанды жеке тінту хаттамасы', name_ru: 'Протокол личного обыска задержанного' },
+  { id: 'p16', name_kz: 'Алу хаттамасы', name_ru: 'Протокол выемки' },
+  { id: 'p17', name_kz: 'Салыстырмалы зерттеу үшін үлгілерді алу хаттамасы', name_ru: 'Протокол получения образцов для сравнительного исследования' },
+  { id: 'p18', name_kz: 'Мүлікке тыйым салу хаттамасы', name_ru: 'Протокол наложения ареста на имущество' },
+  { id: 'p19', name_kz: 'Оқиға болған жерді тексеру хаттамасы', name_ru: 'Протокол осмотра места происшествия' },
+  { id: 'p20', name_kz: 'Оқиға болған жерді және мәйітті тексеру хаттамасы', name_ru: 'Протокол осмотра места происшествия и трупа' },
+  { id: 'p21', name_kz: 'Заттай дәлелдемелерді тексеру хаттамасы', name_ru: 'Протокол осмотра вещественных доказательств' },
+  { id: 'p22', name_kz: 'Куәландыру хаттамасы', name_ru: 'Протокол освидетельствования' },
+  { id: 'p23', name_kz: 'Айыпталушыны сараптама тағайындау туралы қаулымен таныстыру хаттамасы', name_ru: 'Протокол ознакомления обвиняемого с постановлением о назначении экспертизы' },
+  { id: 'p24', name_kz: 'Айыпталушыға танысу үшін сарапшы қорытындыларын көрсету хаттамасы', name_ru: 'Протокол предъявления обвиняемому заключения эксперта для ознакомления' },
+  { id: 'p25', name_kz: 'Сарапшыдан жауап алу хаттамасы', name_ru: 'Протокол допроса эксперта' },
+  { id: 'p26', name_kz: 'Тергеудің аяқталғаны туралы айыпталушыға хабарлау хаттамасы', name_ru: 'Протокол уведомления обвиняемого об окончании следствия' },
+  { id: 'p27', name_kz: 'Айыпталушыны және оның қорғаушысын қылмыстық іс материалдарымен таныстыру хаттамасы', name_ru: 'Протокол ознакомления обвиняемого и его защитника с материалами уголовного дела' },
 ];
 
 export default function CreateProtocolPage() {
@@ -330,16 +349,34 @@ export default function CreateProtocolPage() {
                     {msg.doc && (
                       <div style={{
                         background:'white', border:'1px solid var(--border-light)',
-                        borderRadius:'var(--radius-md)', padding:16, display:'flex', gap:8, flexWrap:'wrap'
+                        borderRadius:'var(--radius-md)', padding:0, marginTop:8,
+                        overflow:'hidden', maxWidth:'100%'
                       }}>
-                        <button className="btn btn-primary btn-sm" onClick={() => handleDownload(msg.doc.id, 'docx')}>
-                          <span className="material-icons-outlined" style={{fontSize:16}}>description</span>
-                          DOCX
-                        </button>
-                        <button className="btn btn-primary btn-sm" onClick={() => handleDownload(msg.doc.id, 'pdf')}>
-                          <span className="material-icons-outlined" style={{fontSize:16}}>picture_as_pdf</span>
-                          PDF
-                        </button>
+                        <textarea
+                          defaultValue={msg.doc.content || ''}
+                          onChange={e => {
+                            const updated = {...msg.doc, content: e.target.value};
+                            setMessages(prev => prev.map(m => m.id === msg.id ? {...m, doc: updated} : m));
+                            setGeneratedDoc(updated);
+                          }}
+                          style={{
+                            width:'100%', minHeight:250, maxHeight:400, padding:'16px 20px',
+                            border:'none', outline:'none', resize:'vertical',
+                            fontFamily:"'Times New Roman', serif", fontSize:13, lineHeight:1.7,
+                            color:'var(--text-primary)', background:'#FAFBFF',
+                            whiteSpace:'pre-wrap'
+                          }}
+                        />
+                        <div style={{display:'flex', gap:8, padding:'10px 16px', borderTop:'1px solid var(--border-light)', background:'white'}}>
+                          <button className="btn btn-primary btn-sm" onClick={() => handleDownload(msg.doc.id, 'docx')}>
+                            <span className="material-icons-outlined" style={{fontSize:16}}>description</span>
+                            DOCX
+                          </button>
+                          <button className="btn btn-primary btn-sm" onClick={() => handleDownload(msg.doc.id, 'pdf')}>
+                            <span className="material-icons-outlined" style={{fontSize:16}}>picture_as_pdf</span>
+                            PDF
+                          </button>
+                        </div>
                       </div>
                     )}
                     <div style={{fontSize:'var(--font-xs)', color:'var(--text-muted)', alignSelf: msg.role==='user' ? 'flex-end' : 'flex-start'}}>

@@ -1557,7 +1557,10 @@ img { max-width: 100%; display: block; }
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #6C5CE7 0%, #4A6CF7 40%, #00B4D8 100%);
+  background-image: linear-gradient(135deg, rgba(108, 92, 231, 0.75) 0%, rgba(74, 108, 247, 0.6) 40%, rgba(0, 180, 216, 0.5) 100%), url('/assets/login-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   padding: 20px;
   position: relative;
   overflow: hidden;
@@ -1588,7 +1591,7 @@ img { max-width: 100%; display: block; }
 .login-card {
   width: 100%;
   max-width: 420px;
-  background: rgba(255, 255, 255, 0.97);
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
   padding: 40px;
   border-radius: var(--radius-xl);
